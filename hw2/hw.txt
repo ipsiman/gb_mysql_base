@@ -1,0 +1,38 @@
+# mysql_base_hw2
+
+# 1 задание
+файл в Виндовс в домашней директории mysql - my.ini
+
+[mysql]
+user=root
+password=mypass
+
+
+# 2 задание
+-- удаляем БД, если есть и создаем новую
+DROP DATABASE IF EXISTS example;
+CREATE DATABASE IF NOT EXISTS example;
+
+-- переключаемся на нашу БД
+USE example;
+
+-- создаем таблицу из 2-х столбцов
+CREATE TABLE users (
+  id INT unsigned,
+  name VARCHAR(255)
+);
+
+-- вставляем значения и проверяем, что все работает
+INSERT INTO users VALUES(1, 'Sergei');
+SELECT * FROM users;
+
+
+# 3 задание
+>mysqldump -u root -p example > sample.sql
+>mysql DROP DATABASE IF EXISTS sample;
+>mysql CREATE DATABASE IF NOT EXISTS sample;
+>mysqldump -u root -p sample < sample.sql
+
+
+# 4 задание
+>mysqldump -u root -p --where="1 limit 100" mysql help_keyword > test_help.sql
