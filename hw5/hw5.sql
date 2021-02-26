@@ -22,6 +22,12 @@ VALUES
   ('Иван', '1998-01-12', NULL, NULL),
   ('Мария', '2006-08-29', NULL, NULL);
 
+-- +++ РЕШЕНИЕ +++
+DESC users;
+SELECT * FROM users;
+UPDATE users SET created_at = NOW(), updated_at = NOW();
+
+ 
 -- Тема Операции, задание 2
 -- Таблица users была неудачно спроектирована.
 -- Записи created_at и updated_at были заданы типом VARCHAR и в них долгое время помещались
@@ -45,6 +51,18 @@ VALUES
   ('Сергей', '1988-02-14', '21.10.2016 9:14', '21.10.2016 9:14'),
   ('Иван', '1998-01-12', '15.12.2016 12:45', '15.12.2016 12:45'),
   ('Мария', '2006-08-29', '12.01.2017 8:56', '12.01.2017 8:56');
+ 
+-- +++ РЕШЕНИЕ +++
+DESC users;
+SELECT * FROM users;
+SELECT STR_TO_DATE(created_at, '%d.%m.%Y %k:%i') FROM users;
+UPDATE users 
+SET created_at = STR_TO_DATE(created_at, '%d.%m.%Y %k:%i'),
+	updated_at = STR_TO_DATE(updated_at, '%d.%m.%Y %k:%i');
+ALTER TABLE users MODIFY created_at DATETIME;
+ALTER TABLE users MODIFY updated_at DATETIME;
+DESC users;
+
 
 -- Тема Операции, задание 3
 -- В таблице складских запасов storehouses_products в поле value могут встречаться самые
@@ -71,10 +89,22 @@ VALUES
   (1, 719, 500),
   (1, 638, 1);
 
+ -- +++ РЕШЕНИЕ +++
+DESC storehouses_products;
+SELECT * FROM storehouses_products;
+SELECT * FROM storehouses_products ORDER BY value>0 DESC, value;
+
+
 -- Тема Операции, задание 4
 -- (по желанию) Из таблицы users необходимо извлечь пользователей, родившихся в
 -- августе и мае. Месяцы заданы в виде списка английских названий ('may', 'august')
 -- Используйте таблицу профилей БД ВК
+
+ -- +++ РЕШЕНИЕ +++
+SELECT * FROM profiles;
+SELECT birthday FROM profiles;
+SELECT * FROM profiles WHERE MONTHNAME(birthday) IN ('may', 'august');
+
 
 -- Тема Операции, задание 5
 -- (по желанию) Из таблицы catalogs извлекаются записи при помощи запроса.
@@ -87,15 +117,56 @@ INSERT INTO catalogs VALUES
   (NULL, 'Видеокарты'),
   (NULL, 'Жесткие диски'),
   (NULL, 'Оперативная память');
+ 
+-- +++ РЕШЕНИЕ +++
+DROP TABLE IF EXISTS catalogs;
+CREATE TABLE catalogs (
+  id SERIAL PRIMARY KEY,
+  catalogs_id INT UNSIGNED,
+  name VARCHAR(255)
+ );
+ 
+INSERT INTO catalogs(catalogs_id, name) VALUES
+  (NULL, 'Процессоры'),
+  (NULL, 'Материнские платы'),
+  (NULL, 'Видеокарты'),
+  (NULL, 'Жесткие диски'),
+  (NULL, 'Оперативная память');
+
+SELECT * FROM catalogs;
+SELECT * FROM catalogs WHERE id IN (5, 1, 2);
+SELECT * FROM catalogs WHERE id IN (5, 1, 2) ORDER BY FIELD(id, 5, 1, 2);
+
 
 -- Тема Агрегация, задание 1
 -- Подсчитайте средний возраст пользователей в таблице users
 -- Используйте таблицу профилей БД ВК
-	  
+
+-- +++ РЕШЕНИЕ +++
+SELECT * FROM users;
+SELECT * FROM profiles;
+SELECT 
+	MIN(YEAR(now()) - YEAR(birthday)) 'Минимальный возраст',
+	MAX(YEAR(now()) - YEAR(birthday)) 'Максимальный возраст',
+	ROUND((AVG(YEAR(now()) - YEAR(birthday)))) 'Средний возраст'
+FROM profiles;
+
+
 -- Тема Агрегация, задание 2
 -- Подсчитайте количество дней рождения, которые приходятся на каждый из дней недели.
 -- Следует учесть, что необходимы дни недели текущего года, а не года 
 -- Используйте таблицу профилей БД ВК
+
+-- +++ РЕШЕНИЕ +++
+SELECT * FROM profiles;
+SELECT 
+	DAYNAME(CONCAT(YEAR(NOW()), '-', substring(birthday, 6, 10))) day_of_birthday,
+	COUNT(CONCAT(YEAR(NOW()), '-', substring(birthday, 6, 10))) count_days
+FROM
+	profiles
+GROUP BY 
+	day_of_birthday;
+
 
 -- Тема Агрегация, задание 3
 -- (по желанию) Подсчитайте произведение чисел в столбце таблицы
@@ -105,6 +176,11 @@ INSERT INTO catalogs VALUES
   (NULL, 'Видеокарты'),
   (NULL, 'Жесткие диски'),
   (NULL, 'Оперативная память');
+
+-- +++ РЕШЕНИЕ +++
+SELECT * FROM catalogs;
+SELECT id FROM catalogs;
+SELECT EXP(SUM(log(id))) 'Произведение чисел' FROM catalogs;
 
 
 
